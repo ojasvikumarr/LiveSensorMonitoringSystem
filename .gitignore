@@ -17,7 +17,12 @@ target/
 *.ipr
 *.iws
 *.code-workspace
-./deploy.Spotlight
+
+# Deployment scripts
+deploy.sh
+deploy.*.sh
+*.key
+
 # OS files
 .DS_Store
 .DS_Store?
