@@ -4,16 +4,16 @@ const getBaseUrl = () => {
   if (typeof window === 'undefined') {
     // Server-side rendering
     if (process.env.USE_VM_IP === 'true') {
-      return 'http://80.225.196.247';
+      return 'http://144.24.97.79';
     }
     return process.env.NODE_ENV === 'production' 
-      ? 'http://80.225.196.247'
+      ? 'http://144.24.97.79'
       : 'http://localhost';
   }
   
   // Client-side
   if (process.env.NODE_ENV === 'production' || process.env.USE_VM_IP === 'true') {
-    return 'http://80.225.196.247';
+    return 'http://144.24.97.79';
   }
   
   return `http://${window.location.hostname}`;

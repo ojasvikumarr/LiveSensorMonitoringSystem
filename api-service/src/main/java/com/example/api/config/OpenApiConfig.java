@@ -23,7 +23,7 @@ public class OpenApiConfig {
                                 .url("http://localhost:8083")
                                 .description("Development server"),
                         new Server()
-                                .url("http://80.225.196.247:8083")
+                                .url("http://144.24.97.79:8083")
                                 .description("Production server")));
     }
 }

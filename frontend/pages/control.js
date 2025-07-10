@@ -317,7 +317,7 @@ const ControlPanel = () => {
               </div>
               <div className="pt-3 border-t border-gray-200">
                 <button
-                  onClick={() => window.open('http://80.225.196.247:8083/swagger-ui/index.html', '_blank')}
+                  onClick={() => window.open('http://144.24.97.79:8083/swagger-ui/index.html', '_blank')}
                   disabled={!services.api || services.api?.status !== 'UP'}
                   className={`w-full px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                     !services.api || services.api?.status !== 'UP'

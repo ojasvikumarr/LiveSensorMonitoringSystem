@@ -16,7 +16,7 @@ const nextConfig = {
   
   // Allow external hostnames in image domains
   images: {
-    domains: ['localhost', '80.225.196.247'],
+    domains: ['localhost', '144.24.97.79'],
   },
   
   // Disable static generation for API routes to ensure they work in all environments

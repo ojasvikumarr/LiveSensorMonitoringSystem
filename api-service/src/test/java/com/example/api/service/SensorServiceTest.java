@@ -15,9 +15,15 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+/**
+ * simple tests for the sensor service
+ * basic tests to check key things:
+ * - key generation works right
+ * - handles nonexistent data ok
+ * - retrieves actual sensor data
+ */
 @ExtendWith(MockitoExtension.class)
 class SensorServiceTest {
 
@@ -34,13 +40,44 @@ class SensorServiceTest {
     void setUp() {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         
-        // Set the Redis key prefix using reflection (simulates @Value injection)
+        // inject the key prefix
         ReflectionTestUtils.setField(sensorService, "redisKeyPrefix", "sensor:");
     }
 
     @Test
-    void getLatestSensorReading_Success() {
-        // Given
+    void check_key_generation() {
+        // setup
+        String sensorId = "101";
+        String expectedKey = "sensor:101";
+        
+        // do it
+        sensorService.getLatestSensorReading(sensorId);
+        
+        // check results
+        verify(valueOperations).get(expectedKey);
+        
+        // try the other method too
+        sensorService.sensorExists(sensorId);
+        verify(redisTemplate).hasKey(expectedKey);
+    }
+
+    @Test
+    void no_data_for_sensor999() {
+        // setup stuff
+        String nonExistentSensorId = "999";
+        when(valueOperations.get("sensor:" + nonExistentSensorId)).thenReturn(null);
+
+        // call the method
+        Optional<SensorReading> result = sensorService.getLatestSensorReading(nonExistentSensorId);
+
+        // make sure it's empty
+        assertFalse(result.isPresent());
+        verify(valueOperations).get("sensor:" + nonExistentSensorId);
+    }
+
+    @Test
+    void get_sensor101_data() {
+        // prep test data
         String sensorId = "101";
         SensorReading expectedReading = new SensorReading(
             sensorId, 
@@ -54,41 +91,14 @@ class SensorServiceTest {
         when(valueOperations.get("sensor:" + sensorId))
             .thenReturn(expectedReading);
 
-        // When
+        // run the test
         Optional<SensorReading> result = sensorService.getLatestSensorReading(sensorId);
 
-        // Then
+        // verify it works
         assertTrue(result.isPresent());
         assertEquals(expectedReading.getSensorId(), result.get().getSensorId());
         assertEquals(expectedReading.getTemperature(), result.get().getTemperature());
+        assertEquals(expectedReading.getPressure(), result.get().getPressure());
         verify(valueOperations).get("sensor:" + sensorId);
-    }
-
-    @Test
-    void getLatestSensorReading_NotFound() {
-        // Given
-        String sensorId = "999";
-        when(valueOperations.get("sensor:" + sensorId)).thenReturn(null);
-
-        // When
-        Optional<SensorReading> result = sensorService.getLatestSensorReading(sensorId);
-
-        // Then
-        assertFalse(result.isPresent());
-        verify(valueOperations).get("sensor:" + sensorId);
-    }
-
-    @Test
-    void sensorExists_True() {
-        // Given
-        String sensorId = "101";
-        when(redisTemplate.hasKey("sensor:" + sensorId)).thenReturn(true);
-
-        // When
-        boolean result = sensorService.sensorExists(sensorId);
-
-        // Then
-        assertTrue(result);
-        verify(redisTemplate).hasKey("sensor:" + sensorId);
     }
 }
